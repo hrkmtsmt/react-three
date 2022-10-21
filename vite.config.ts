@@ -13,5 +13,10 @@ export default defineConfig({
     alias: {
       '@src/': srcDir
     }
+  },
+  server: {
+    watch: {
+      usePolling: true,
+    }
   }
 });
