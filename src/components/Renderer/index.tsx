@@ -1,62 +1,41 @@
-import React, { useEffect, useRef } from "react";
-import * as THREE from 'three';
-import textureImage from '@src/assets/texture.png'
+import React, { useEffect, useRef } from 'react';
+import { WebGL1Renderer, PerspectiveCamera } from 'three';
+import { ball } from '@src/three/ball';
 
 const Component: React.FC = () => {
-  
-  const ref = useRef<HTMLDivElement>(null)
-  
+  const ref = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
     const div = ref.current;
-    
+
     if (!div) return;
 
-    const renderer = new THREE.WebGL1Renderer();
-    
-    div.appendChild(renderer.domElement);
-    
-    renderer.setPixelRatio(window.devicePixelRatio);
-    renderer.setSize(400, 400);
-    
-    const scene = new THREE.Scene();
-    
-    const camera = new THREE.PerspectiveCamera(45, 1, 1, 10000);
-    camera.position.set(0, 0, +1000);
-    
-    const geometry = new THREE.SphereGeometry(300, 30, 30);
-    
-    const loader = new THREE.TextureLoader();
-    
-    const texture = loader.load(textureImage);
-    
-    const material = new THREE.MeshStandardMaterial({
-      map: texture
-    });
+    const { ballScene, ballMesh } = ball();
 
-    const mesh = new THREE.Mesh(geometry, material);
-    
-    scene.add(mesh);
-    
-    const directionalLight = new THREE.DirectionalLight(0xffffff);
-    directionalLight.position.set(1, 1, 1);
-    
-    scene.add(directionalLight);
-    
+    const renderer = new WebGL1Renderer();
+
+    div.appendChild(renderer.domElement);
+
+    renderer.setPixelRatio(1);
+    renderer.setSize(800, 800);
+
+    const camera = new PerspectiveCamera(100, 1, 1, 10000);
+    camera.position.set(0, 0, 2000);
+
     const trick = () => {
-      mesh.rotation.y = mesh.rotation.y + 0.01
-      renderer.render(scene, camera);
+      ballMesh.rotation.y = ballMesh.rotation.y + 0.01;
+      renderer.render(ballScene, camera);
       requestAnimationFrame(trick);
-    }
-    
+    };
+
     trick();
-    
+
     return () => {
       div.removeChild(renderer.domElement);
-    }
+    };
+  }, []);
 
-  }, [])
-
-  return <div ref={ref} />
+  return <div ref={ref} />;
 };
 
-export const ThreeRenderer = React.memo(Component)
+export const ThreeRenderer = React.memo(Component);
